@@ -32,3 +32,7 @@ div.selected {
   color: #fff;
   font-weight: bold;
 }
+
+.list ul {
+  overflow: hidden;
+}
