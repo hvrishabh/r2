@@ -28,7 +28,7 @@ export default function StarRating({ maxRating = 5 }) {
         {Array.from({ length: maxRating }, (_, i) => (
           <Star
             key={i}
-            onRate={(e) => handleRating(i + 1)}
+            onRate={() => handleRating(i + 1)}
             full={rating >= i + 1}
           />
         ))}

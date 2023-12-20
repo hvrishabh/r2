@@ -1,8 +1,7 @@
-import { StrictMode, useState } from "react";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import App from "./star/App";
-import StarRating from "./star/StarRating";
 
 const rootElement = document.getElementById("root");
 const root = createRoot(rootElement);
@@ -13,20 +12,6 @@ const root = createRoot(rootElement);
 //   </StrictMode>
 // );
 
-function Test() {
-  // const [tempRating, setTempRating] = useState(0);
-  const [movieRating, setMovieRating] = useState(0);
-  return (
-    <div>
-      <StarRating color="orange" maxRating={15} onSetRating={setMovieRating} />
-      <p>
-        {/* This movie was rated {tempRating} stars */}
-        This movie was rated {movieRating} stars
-      </p>
-    </div>
-  );
-}
-
 root.render(
   <StrictMode>
     <App maxRating={5} />
@@ -36,12 +21,24 @@ root.render(
     />
     <App maxRating={7} color={"red"} size={30} />
     <App
+      // maxRating={}
       color={"grey"}
       size={50}
       messages={["terrible", "bad", "ok", "good", "amazing"]}
       defaultRating={2}
-    />
 
-    <Test />
+      // messages={["one", "two", "three", "four", "five", "six", "seven"]}
+    />
+    {/* <StarRating
+      maxRating={5}
+      messages={["terrible", "bad", "ok", "good", "amazing"]}
+      defaultRating={3}
+    /> */}
+    {/* <StarRating maxRating={10} size={23} color="red" className={test} /> */}
+
+    {/* <StarRating maxRating={10} />
+    <StarRating /> */}
+
+    {/* <Test /> */}
   </StrictMode>
 );
