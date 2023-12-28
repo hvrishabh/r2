@@ -16,12 +16,20 @@ const root = createRoot(rootElement);
 function Test() {
   // const [tempRating, setTempRating] = useState(0);
   const [movieRating, setMovieRating] = useState(0);
+  const [tempRating1, setMovieRating1] = useState(0);
+
   return (
     <div>
-      <StarRating color="orange" maxRating={15} onSetRating={setMovieRating} />
+      <StarRating
+        color="red"
+        maxRating={15}
+        onSetRating={setMovieRating}
+        onSetRating1={setMovieRating1}
+      />
+      {console.log(tempRating1)}
       <p>
         {/* This movie was rated {tempRating} stars */}
-        This movie was rated {movieRating} stars
+        This movie was rated {movieRating} is {tempRating1} stars
       </p>
     </div>
   );

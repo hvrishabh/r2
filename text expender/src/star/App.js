@@ -16,7 +16,12 @@ export default function StarRating({
   size = 48,
   messages = [],
   defaultRating = 3,
-  onSetRating,
+  onSetRating = function () {
+    return null;
+  },
+  onSetRating1 = function () {
+    return null;
+  },
 }) {
   const textStyle = {
     lineHeight: "1",
@@ -29,6 +34,17 @@ export default function StarRating({
 
   function handleRating(rating) {
     setRating(rating);
+    onSetRating(rating);
+  }
+
+  function mouseRatingEnter(rating1) {
+    setTempRating(rating1);
+    onSetRating1(tempRating);
+  }
+
+  function mouseRatingLeaver(rating2) {
+    setTempRating(rating2);
+    onSetRating1(tempRating);
   }
   // console.log(messages);
   return (
@@ -39,8 +55,8 @@ export default function StarRating({
             key={i}
             full={tempRating ? tempRating >= i + 1 : rating >= i + 1}
             onRate={() => handleRating(i + 1)}
-            onHoverIn={() => setTempRating(i + 1)}
-            onHoverOut={() => setTempRating(0)}
+            onHoverIn={() => mouseRatingEnter(i + 1)}
+            onHoverOut={() => mouseRatingLeaver(0)}
             color={color}
             size={size}
           />
