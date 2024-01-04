@@ -24,7 +24,7 @@ StarRating.propTypes = {
 export default function StarRating({
   maxRating = 5,
   color = "#fcc419",
-  size = 48,
+  size = 24,
   messages = [],
   defaultRating = 0,
   onSetRating,
@@ -70,7 +70,7 @@ export default function StarRating({
 
 function Star({ onRate, full, onHoverIn, onHoverOut, color, size }) {
   const starStyle = {
-    width: "48px",
+    width: "24px",
     height: `${size}px`,
     display: "block",
     cursor: "pointer",

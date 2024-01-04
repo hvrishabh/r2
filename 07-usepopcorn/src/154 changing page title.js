@@ -53,7 +53,7 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 export default function App() {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState("interstellar");
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   // creating a loading indicator
@@ -78,21 +78,15 @@ export default function App() {
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
-
   useEffect(
     function () {
-      // creating abort function for the cleanup of fetch function
-
-      const controller = new AbortController();
-
       async function fetchMovies() {
         try {
           setIsLoading(true);
           setError("");
 
           const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
-            { signal: controller.signal }
+            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
           );
 
           if (!res.ok)
@@ -103,10 +97,8 @@ export default function App() {
           if (data.Response === "False") throw new Error("movie not found ");
 
           setMovies(data.Search);
-          setError("");
           // console.log(data.Search);
         } catch (err) {
-          if (err.name !== "AbortError") console.log(err.message);
           setError(err.message);
         } finally {
           setIsLoading(false);
@@ -118,12 +110,7 @@ export default function App() {
         setError("");
         return;
       }
-
-      handleCloseMovie();
       fetchMovies();
-      return function () {
-        controller.abort();
-      };
     },
     [query]
   );
@@ -302,25 +289,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
 
   useEffect(
     function () {
-      function callback(e) {
-        if (e.code === "Escape") {
-          onCloseMovie();
-          // console.log("closing.......");
-        }
-      }
-
-      document.addEventListener("keydown", callback);
-
-      return function () {
-        document.removeEventListener("keydown", callback);
-      };
-    },
-
-    [onCloseMovie]
-  );
-
-  useEffect(
-    function () {
       const KEY = "6855ab2d";
       async function getMovieDetails() {
         setIsLoading(true);
@@ -342,11 +310,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     function () {
       // if (!title) return;
       !title || (document.title = `Movie | ${title}`);
-
-      return function () {
-        document.title = "usePopcorn";
-        // console.log(`Clean up effect for movie ${title}`);
-      };
     },
     [title]
   );
