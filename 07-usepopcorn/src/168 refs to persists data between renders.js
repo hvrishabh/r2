@@ -1,18 +1,28 @@
 import { useEffect, useRef, useState } from "react";
 
 import StarRating from "./StarRating";
-import { useMovies } from "./useMovies";
-import { useLocalStorageState } from "./useLocalStorageState";
-import { useKey } from "./useKey";
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 export default function App() {
   const [query, setQuery] = useState("");
+  const [movies, setMovies] = useState([]);
+  // const [watched, setWatched] = useState([]);
+
+  // creating a loading indicator
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
 
-  const [watched, setWatched] = useLocalStorageState([], "watched");
+  const [watched, setWatched] = useState(function () {
+    // useState can have a callback function, but it needs to be a pure function , i.e we can not have the arguments in that function.
+    const storedValue = localStorage.getItem("watched");
+    return JSON.parse(storedValue);
+  });
+
+  // but we should not call a function in useState , like
+  // useState(localStorage.getItem("Watched"))// this will give the wrong results
 
   const KEY = "6855ab2d";
 
@@ -26,13 +36,70 @@ export default function App() {
 
   function handleAddWatched(movie) {
     setWatched((watched) => [...watched, movie]);
+
+    // Storing to local store 1. using handlerFunction ,2. in useEffect.......................................
+    // localStorage.setItem("watched", JSON.stringify([...watched, movie]));
   }
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
 
-  const { movies, isLoading, error } = useMovies(query);
-  // const { movies, isLoading, error } = useMovies(query, handleCloseMovie);
+  useEffect(
+    function () {
+      // local store is used to store a item in browser , in the form of key value pairs, but only strings can be stored in this.
+      localStorage.setItem("watched", JSON.stringify(watched));
+    },
+    [watched]
+  );
+
+  useEffect(
+    function () {
+      // creating abort function for the cleanup of fetch function
+
+      const controller = new AbortController();
+
+      async function fetchMovies() {
+        try {
+          setIsLoading(true);
+          setError("");
+
+          const res = await fetch(
+            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+            { signal: controller.signal }
+          );
+
+          if (!res.ok)
+            throw new Error("something went wrong with fetching movies.");
+
+          const data = await res.json();
+
+          if (data.Response === "False") throw new Error("movie not found ");
+
+          setMovies(data.Search);
+          setError("");
+          // console.log(data.Search);
+        } catch (err) {
+          if (err.name !== "AbortError") console.log(err.message);
+          setError(err.message);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+
+      if (query.length < 3) {
+        setMovies([]);
+        setError("");
+        return;
+      }
+
+      handleCloseMovie();
+      fetchMovies();
+      return function () {
+        controller.abort();
+      };
+    },
+    [query]
+  );
 
   return (
     <>
@@ -99,13 +166,33 @@ function Logo() {
 }
 
 function Search({ query, setQuery }) {
+  // Making focus on the Search element when the page mounts
+  // We should not do direct DOM manipulation, rather we should use useRef hook.............
+  // useEffect(function () {
+  //   const el = document.querySelector(".search");
+  //   console.log(el);
+  //   el.focus();
+  // }, []);
+
   const inputEl = useRef(null);
 
-  useKey("Enter", function () {
-    if (document.activeElement === inputEl.current) return;
-    inputEl.current.focus();
-    setQuery("");
-  });
+  useEffect(
+    function () {
+      // console.log(inputEl.current);
+
+      function callback(e) {
+        if (document.activeElement === inputEl.current) return;
+        if (e.code === "Enter") {
+          inputEl.current.focus();
+          setQuery("");
+        }
+      }
+
+      document.addEventListener("keydown", callback);
+      return () => document.addEventListener("keydown", callback);
+    },
+    [setQuery]
+  );
 
   return (
     <input
@@ -177,14 +264,16 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState("");
 
+  // TODO: this is for useRef to calculate how many times the rating is changed, before adding to the list.
   const countRef = useRef(0);
+  // let count = 0; // this will not work , bcoz it will reset after every re-render
 
   useEffect(
     function () {
       if (userRating) countRef.current = countRef.current + 1;
       // if (userRating) count++;
     },
-    [userRating]
+    [userRating, count]
   );
   /////////////////////////////////////////////
   const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
@@ -226,7 +315,24 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     onCloseMovie();
   }
 
-  useKey("Escape", onCloseMovie);
+  useEffect(
+    function () {
+      function callback(e) {
+        if (e.code === "Escape") {
+          onCloseMovie();
+          // console.log("closing.......");
+        }
+      }
+
+      document.addEventListener("keydown", callback);
+
+      return function () {
+        document.removeEventListener("keydown", callback);
+      };
+    },
+
+    [onCloseMovie]
+  );
 
   useEffect(
     function () {
