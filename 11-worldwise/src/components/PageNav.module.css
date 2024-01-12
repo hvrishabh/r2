@@ -1,0 +1,18 @@
+.nav {
+  background-color: orange;
+}
+
+.nav ul {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+}
+
+.nav :global(.active) {
+  background-color: green;
+}
+
+/* :global(.test) {
+  background-color: red;
+}
+here we have to define classes , selecting the direct element won't work  */
