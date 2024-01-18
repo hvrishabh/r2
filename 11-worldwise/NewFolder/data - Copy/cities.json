@@ -1,0 +1,28 @@
+{
+  "cities": [
+    {
+      "cityName": "Lisbon",
+      "country": "Portugal",
+      "emoji": "🇵🇹",
+      "date": "2027-10-31T15:59:59.138Z",
+      "notes": "My favorite city so far!",
+      "position": {
+        "lat": 38.727881642324164,
+        "lng": -9.140900099907554
+      },
+      "id": 73930385
+    },
+    {
+      "id": "beb5",
+      "cityName": "Santorcaz",
+      "country": "Spain",
+      "emoji": "🇪🇸",
+      "date": "2024-01-18T07:06:23.573Z",
+      "notes": "asfd",
+      "position": {
+        "lat": "40.443092868096976",
+        "lng": "-3.2298482535220345"
+      }
+    }
+  ]
+}
